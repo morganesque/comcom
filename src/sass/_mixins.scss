@@ -1,0 +1,38 @@
+$fix-mqs: false !default;
+
+/*
+    ie8 and lower separate desktop stylesheet approach from here:
+    http://jakearchibald.github.io/sass-ie/
+*/
+
+@mixin above($width) {
+
+	@if $fix-mqs {
+        
+        @if $fix-mqs gte $width { @content; }
+
+    } @else {
+        
+        @media only screen and (min-width:$width) {@content;}
+    }
+    
+}
+
+@mixin below($width) {
+
+	@if $fix-mqs {
+        
+        @if $fix-mqs lte $width { @content; }
+
+    } @else {
+        
+        @media only screen and (max-width:$width) {@content;}
+    }
+
+    
+}
+
+@function pem($px, $base: 16) {
+
+    @return round($px / $base) + em;
+}
