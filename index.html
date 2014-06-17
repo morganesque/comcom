@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->        
+        <link rel="stylesheet" href="css/styles.css">        
+        <!-- <script src="js/vendor/modernizr-2.6.2.min.js"></script>-->
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+        <h1><span class="up">Comedian's Comedian</span> podcast</h1>
+        <p class="intro">Reads in the <a href="http://www.comedianscomedian.com/">Comedian's Comedian Podcast</a> <a href="http://feeds.feedburner.com/stuartgoldsmith">RSS feed</a> and gives you (mainly me) a nice way to quickly find a comedian and a youtube search for them.</p>
+
+        <p class="search"><input type="text" placeholder="search" id="search-input"></p>
+
+        <div id="main"></div>
+
+        
+        <script src="js/all.min.js"></script>
+        <script src="js/comedian.js"></script>
+        <script src="js/comdata.js"></script>
+        <script type="text/javascript">
+
+        /*
+            slightly different collection.
+        */        
+        var List = Backbone.Collection.extend({model:ComData});
+
+        /*
+            global vars.
+        */        
+        var source, 
+            template,
+            comedians = new List();  
+
+        /*
+            deal with searches.
+        */        
+        var searchComedians = _.debounce(function(e)
+        {
+            var v = $(this).val().toLowerCase();
+            var f = comedians.each(function(a,b,c)
+            {
+                var name = a.get('name').toLowerCase();
+                var r = name.indexOf(v);
+                if (r == -1) a.set({'hide':true});
+                else a.set({'hide':false});
+            });
+        },100);
+        $('#search-input').on('keyup',searchComedians);
+
+        /*
+            kick things off (fetch RSS feed).
+        */        
+        $(document).on('ready',function()
+        {
+            $.ajax({
+                dataType: "jsonp",
+                crossDomain: true,
+                data: {
+                    format:'json',
+                },
+                url: "http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=100&q=http://feeds.feedburner.com/stuartgoldsmith",
+                jsonp: "callback",
+                jsonpCallback: "gotFeed"
+            });
+
+            source = $('#item-template').html();
+            template = Handlebars.compile(source);            
+
+            $('#search-input').focus();
+        });
+
+        /*
+            deal with data when it's been got.
+        */        
+        function gotFeed(a)
+        {
+            var entries = a.responseData.feed.entries;
+            _.each(entries,function(data,c,d)
+            {                
+                var comod = comedians.add(data);                
+                var comvi = new Comedian({model:comod});
+                comod.getName();
+                
+                $('#main').append(comvi.el);
+            });            
+        };  
+
+        </script>
+
+
+        <script type="text/x-handlebars-template" id="item-template">
+        <div href="#" class="comedian">
+            <div class="front">
+                <p class="date">{{date}}</p>
+                <p class="number">{{number}}</p>
+                <h3 class="name">{{name}}</h3>
+            </div>
+            <div class="blurb">
+                <p>{{blurb}}</p>
+                <p class="small">{{extras}}</p>
+            </div>
+            <div class="icons">
+                <a class="info" href="#" title="info"><span class="icon icon-info-circle"></span></a>
+                <a class="youtube" target="_blank" href="#" title="youtube"><span class="icon icon-youtube-square"></span></a>
+            </div>
+        </div> 
+        </script>
+
+        <?php /*
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='//www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-XXXXX-X');ga('send','pageview');
+        </script>
+        */ ?>
+        <script src="http://localhost:35729/livereload.js"></script>
+        <script type="text/javascript">
+        $(window).on('load',function()
+        {
+            // load google font.
+            $('head').append("<link href='http://fonts.googleapis.com/css?family=Roboto:400,100,900,700,700italic,400italic' rel='stylesheet' type='text/css'>");
+            // load icon font.
+            $('head').append('<link rel="stylesheet" href="http://i.icomoon.io/public/temp/cd0d0fee74/Comcom/style.css" rel="stylesheet" type="text/css">');
+
+            /*
+                set width to what it naturally becomes (i.e. by content).
+            */        
+            $('.item').each(function()
+            {
+                var width = $(this).css('width');
+                $(this).css({'width':width});
+            });
+        });
+        </script>
+    </body>
+</html>
