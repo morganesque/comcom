@@ -1,4 +1,4 @@
 comcom
 ======
 
-A bit of a convenience page based on the Comedian's Comedian Podcast feed.
+It tends to be when I'm listening to the Comedian's Comedian Podcast and I'm thinking "oh I should really check this person out on Youtube or something". Then I forget their name, and so I'm looking for a place to quickly check that and then I'm thinking "was it them or another person?" and I usually end up looking for some kind of archive of episodes or something but Stu doesn't have that on the [website](http://www.comedianscomedian.com/) so the best I could find is the [feedburner page for the podcast RSS feed](http://feeds.feedburner.com/stuartgoldsmith) which is fine but a bit of a hard one to negotiate and I'm thinking it wouldn't be too hard to knock up a quick page which reads in the RSS feed and just displays something similar which is a bit nicer to look at and easier to use and maybe even has links directly to Youtube so I built one and [here it is](http://morganesque.github.io/comcom/).
